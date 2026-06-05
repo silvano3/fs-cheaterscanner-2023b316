@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Funnel Spy — CheaterScanner</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-card: #161616;
+    --bg-card-2: #1c1c1c;
+    --border: #2a2a2a;
+    --text: #f0f0f0;
+    --text-dim: #9a9a9a;
+    --text-mute: #6a6a6a;
+    --accent: #f97316;
+    --accent-soft: rgba(249,115,22,0.12);
+    --accent-glow: rgba(249,115,22,0.35);
+    --pink: #ec4899;
+    --green: #22c55e;
+    --blue: #3b82f6;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, "SF Pro Display", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
+    padding: 1.2rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(10px);
+  }
+  .header-left { display: flex; align-items: center; gap: 1rem; }
+  .header h1 { margin: 0; font-size: 1.3rem; font-weight: 700; letter-spacing: -0.02em; }
+  .header h1 span { color: var(--accent); }
+  .header .meta { color: var(--text-mute); font-size: 0.85rem; margin-top: 2px; }
+  .header-right { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+
+  .btn {
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .btn:hover { background: var(--bg-card-2); border-color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+  .btn.primary:hover { background: #fb923c; }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 73px;
+    height: calc(100vh - 73px);
+    width: 240px;
+    background: #111;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 1rem 0;
+  }
+  .sidebar h3 { color: var(--text-mute); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0 1.2rem; margin: 0 0 0.6rem; }
+  .nav-item {
+    display: flex; align-items: center; gap: 0.7rem;
+    padding: 0.55rem 1.2rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.82rem;
+    border-left: 3px solid transparent;
+    transition: all 0.12s;
+    cursor: pointer;
+  }
+  .nav-item:hover { background: var(--bg-card); color: var(--text); }
+  .nav-item.active { border-left-color: var(--accent); background: var(--accent-soft); color: var(--text); }
+  .nav-num { color: var(--accent); font-weight: 700; min-width: 22px; font-size: 0.75rem; }
+  .nav-type {
+    font-size: 0.62rem;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+  .nav-title-wrap { flex: 1; overflow: hidden; }
+  .nav-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* MAIN */
+  .main { margin-left: 240px; padding: 2rem 2.5rem 4rem; max-width: 1400px; }
+
+  .filters {
+    display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap;
+    position: sticky; top: 73px; background: var(--bg); z-index: 50; padding: 0.6rem 0; border-bottom: 1px solid var(--border);
+  }
+  .filter-chip {
+    padding: 0.4rem 0.85rem; border-radius: 999px; background: var(--bg-card); border: 1px solid var(--border);
+    color: var(--text-dim); font-size: 0.78rem; cursor: pointer; transition: all 0.12s;
+  }
+  .filter-chip:hover { color: var(--text); border-color: var(--accent); }
+  .filter-chip.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+
+  /* ETAPA CARD */
+  .etapa-card {
+    display: grid;
+    grid-template-columns: 70px 360px 1fr;
+    gap: 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.6rem;
+    margin-bottom: 1.4rem;
+    transition: all 0.2s;
+    scroll-margin-top: 140px;
+  }
+  .etapa-card:hover { border-color: var(--accent); box-shadow: 0 6px 30px var(--accent-glow); }
+  .etapa-numero {
+    font-size: 3.2rem; font-weight: 800; color: var(--accent);
+    line-height: 1; letter-spacing: -0.04em; text-align: center; padding-top: 0.4rem;
+  }
+  .etapa-num-label {
+    font-size: 0.65rem; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 0.4rem; text-align: center;
+  }
+
+  .etapa-screenshot { position: relative; }
+  .etapa-screenshot img {
+    width: 100%; max-width: 360px; border-radius: 10px; cursor: zoom-in;
+    border: 1px solid #333; transition: transform 0.2s;
+    background: #fff;
+  }
+  .etapa-screenshot img:hover { transform: scale(1.02); }
+  .etapa-screenshot .badge-zoom {
+    position: absolute; bottom: 8px; right: 8px;
+    background: rgba(0,0,0,0.7); padding: 4px 8px; border-radius: 6px;
+    font-size: 0.65rem; color: white; backdrop-filter: blur(6px);
+  }
+
+  .etapa-analise h2 { margin: 0 0 0.4rem; font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
+  .etapa-tipo {
+    display: inline-block; padding: 3px 10px; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent);
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
+    margin-bottom: 0.8rem;
+  }
+  .etapa-url {
+    font-size: 0.72rem; color: var(--text-mute); font-family: ui-monospace, "SF Mono", monospace;
+    word-break: break-all; margin: 0 0 1.2rem;
+  }
+  .field { margin-bottom: 1rem; }
+  .field-label {
+    font-size: 0.65rem; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.12em;
+    margin-bottom: 0.3rem; font-weight: 600;
+  }
+  .field-value { color: var(--text); font-size: 0.93rem; line-height: 1.5; }
+  .field-value.quote { font-style: italic; color: #e5e5e5; border-left: 3px solid var(--accent); padding-left: 0.8rem; }
+  .field-value.mech { color: var(--text); }
+  .field-value.obs { color: var(--text-dim); font-size: 0.88rem; }
+
+  .actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+  .copy-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    padding: 0.4rem 0.7rem; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-family: inherit;
+    transition: all 0.12s;
+  }
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+  .copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+  /* CONNECTOR */
+  .conector {
+    text-align: center; color: var(--accent); font-size: 1.8rem;
+    margin: -0.7rem 0 0.7rem; opacity: 0.6;
+  }
+
+  /* MODAL */
+  .modal {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+    z-index: 999; justify-content: center; align-items: center; padding: 2rem;
+    cursor: zoom-out;
+  }
+  .modal.active { display: flex; }
+  .modal img { max-width: 95vw; max-height: 95vh; border-radius: 10px; box-shadow: 0 20px 80px rgba(0,0,0,0.8); }
+  .modal-close {
+    position: absolute; top: 1rem; right: 1.5rem;
+    background: var(--bg-card); border: 1px solid var(--border); color: var(--text);
+    width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 1.1rem;
+  }
+
+  /* FOOTER / SUMMARY */
+  .summary {
+    margin-top: 3rem; padding: 2rem; background: var(--bg-card);
+    border-radius: 14px; border: 1px solid var(--border);
+  }
+  .summary h2 { margin: 0 0 1rem; font-size: 1.1rem; }
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .stat { background: #0d0d0d; padding: 1rem; border-radius: 10px; border: 1px solid var(--border); }
+  .stat-num { font-size: 2rem; font-weight: 700; color: var(--accent); line-height: 1; }
+  .stat-label { color: var(--text-dim); font-size: 0.8rem; margin-top: 0.3rem; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 1rem; }
+    .etapa-card { grid-template-columns: 1fr; gap: 1rem; }
+    .etapa-numero { text-align: left; }
+    .etapa-screenshot img { max-width: 100%; }
+  }
+
+  /* PRINT */
+  @media print {
+    .sidebar, .modal, .header-right, .filters, .copy-btn { display: none !important; }
+    .header { position: static; }
+    .main { margin-left: 0; padding: 1rem; max-width: none; }
+    .etapa-card { break-inside: avoid; page-break-inside: avoid; }
+    body { background: white; color: black; }
+    .etapa-card { background: #f5f5f5; border-color: #ccc; }
+    .etapa-numero { color: #e35a00; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>🔍 Funnel Spy — <span>CheaterScanner</span></h1>
+    <div class="meta" id="meta">carregando…</div>
+  </div>
+  <div class="header-right">
+    <a class="btn" href="relatorio.md" target="_blank">📄 Relatório</a>
+    <a class="btn" href="https://cheatercatcher.ai/" target="_blank">↗ Site original</a>
+    <button class="btn primary" onclick="window.print()">⬇ Exportar PDF</button>
+  </div>
+</div>
+
+<div class="sidebar">
+  <h3>Etapas</h3>
+  <div id="nav-list"></div>
+</div>
+
+<div class="main">
+  <div class="filters" id="filters">
+    <button class="filter-chip active" data-filter="all">Todas</button>
+  </div>
+
+  <div id="cards"></div>
+
+  <div class="summary">
+    <h2>Resumo do funil</h2>
+    <div class="summary-grid" id="summary-grid"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal" onclick="closeModal(event)">
+  <button class="modal-close" onclick="closeModal(event)">✕</button>
+  <img id="modal-img" src="" alt="Screenshot fullscreen">
+</div>
+
+<script type="application/json" id="inline-data">{"concorrente": "CheaterScanner", "url_inicial": "https://www.cheaterscanner.com/", "total_etapas": 8, "etapas": [{"numero": 0, "arquivo": "screenshots/00_etapa.png", "titulo": "CheaterScanner AI - Dating App Scanner | Check if Your Partner is Cheating", "url": "https://www.cheaterscanner.com/", "texto": "English\nEspañol\nFrançais\nDeutsch\nItaliano\nEspañol (MX)\nSearch By Use Case\nLogin\nBlog\nScan Now\nFIND OUT IF\nTHEY'RE CHEATING\n\nInstantly scan dating apps to discover if your partner is active on Tinder, Bumble, Hinge & more\n\nWhat's their gender?\n\nFemale\nMale\n\nCheaterScanner uses AI bots to scan dating apps in different locations to discover if your partner is actively using any dating apps.\n\nCompany\nAbout Us\nBlog\nAffiliates\nFAQ\nPrivacy Policy\nTerms of Service\nRefunds & Cancellations\nDo Not Sell My Info\nSearch By Use Case\nDeep Person Scan\nBumble Profile Search\nTinder Profile Search\nHinge Profile Search\nReverse Phone Lookup\nReverse Email Lookup\nReverse Name Lookup\nConnect With Us\nsupport@cheaterscanner.com (Mon-Fri, 9am-5pm EST. We aim to respond within 24 hours.)\n\n+1 (800) 452-0804\n\nRegistered Agent Address:\n\n1111B South Governers Avenue STE 23315\n\nDover, Delaware, 19904, USA\n\n© 2026 CheaterScanner. All rights reserved.\n\nEnglish\nEspañol\nFrançais\nDeutsch\nItaliano\nEspañol (MX)", "sig": "c5fa5874bf9781ed1613806d863a59bd", "analise": {"tipo": "landing", "headline": "FIND OUT IF THEY'RE CHEATING", "subheadline": "Instantly scan dating apps to discover if your partner is active on Tinder, Bumble, Hinge & more.", "cta": "Female / Male (cards) — entry via 'What's their gender?'", "mecanismo": "Promessa direta + imperativo + 6 idiomas no topo (alcance internacional) + dropdown 'Search By Use Case' segmentando intenção (Deep Person Scan, Bumble Search, Tinder Search, Reverse Phone/Email) + selo 'AI bots' como autoridade técnica", "observacoes": "Hero minimalista comparado a competidores (sem ticker ao vivo, sem logos de mídia). Aposta na promessa nua + entrada imediata pelo gender card. Footer com info corporativa visível (endereço Delaware, telefone 800) — borrowed legitimacy via aparência de empresa real. Multi-idioma sugere foco em escala/tráfego pago internacional."}}, {"numero": 1, "arquivo": "screenshots/01_etapa.png", "titulo": "CheaterScanner AI - Dating App Scanner | Check if Your Partner is Cheating", "url": "https://www.cheaterscanner.com/quiz?qs=age", "texto": "What's their gender?\nMale\nFemale\nHow old are they?\nWhat is their name?\nAdd a location where they might be active\n\nMap will appear here\n\nEnter the person's last known location\n\n[ Optional ]\nFacial Recognition to Search\nAdd photos\nDid you know?\n43% of people on dating apps are actively in relationships according to the New York Times.", "sig": "4a7af9f817fc9ed9ab806c161c505d4b", "analise": {"tipo": "quiz · entrada (idade)", "headline": "How old are they?", "subheadline": "(input numérico, sem opções)", "cta": "→ (chevron-right, sem texto)", "mecanismo": "Pergunta única por tela (foco máximo) + dot navigation (5 dots no topo = 5 perguntas) = barra de progresso minimalista = sunk-cost suave", "observacoes": "Banner inferior 'Did you know? 43% of people on dating apps are actively in relationships according to the New York Times' — autoridade-emprestada via citação NYT, estatística que normaliza dor. Botões de navegação são chevrons sem texto = visualmente clean mas reduz fricção da decisão (não tem 'Continue' grande pedindo commitment)."}}, {"numero": 2, "arquivo": "screenshots/02_etapa.png", "titulo": "CheaterScanner AI - Dating App Scanner | Check if Your Partner is Cheating", "url": "https://www.cheaterscanner.com/quiz?qs=name", "texto": "What's their gender?\nMale\nFemale\nHow old are they?\nWhat is their name?\nAdd a location where they might be active\n\nEnter the person's last known location\n\n[ Optional ]\nFacial Recognition to Search\nAdd photos\nDid you know?\nCheaterScanner boasts a 99.6% accuracy rate across Tinder, Bumble, and Hinge,\nhelping you catch cheaters with confidence. We are not affiliated with Tinder, Bumble, or Hinge. All trademarks are property of their respective owners. We only use publicly available information and never use unauthorized scraping or automated access.", "sig": "75927d37fe0fac3a72f390ccc389d6bb", "analise": {"tipo": "quiz · entrada (nome)", "headline": "What is their name?", "subheadline": "First name (required) — input text", "cta": "→", "mecanismo": "Compromisso emocional: digitar o nome do alvo concretiza a busca + nome vira variável personalizada nas telas seguintes ('compiling report for Alex')", "observacoes": "Banner inferior MUDA pra disclaimer técnico: 'CheaterScanner boasts a 99.6% accuracy rate ... We are not affiliated with Tinder, Bumble, or Hinge. We only use publicly available information' — combina autoridade ('99.6%') com cover-up legal. Esse disclaimer é resposta direta a ad-platform scrutiny (FB/Google banem claims de scanner real)."}}, {"numero": 3, "arquivo": "screenshots/03_etapa.png", "titulo": "CheaterScanner AI - Dating App Scanner | Check if Your Partner is Cheating", "url": "https://www.cheaterscanner.com/quiz?qs=location", "texto": "What's their gender?\nMale\nFemale\nHow old are they?\nWhat is their name?\nAdd a location where they might be active\n\nEnter the person's last known location\n\n[ Optional ]\nFacial Recognition to Search\nAdd photos", "sig": "09b9de9131eaf23385b3d6659ac0b574", "analise": {"tipo": "quiz · entrada (localização)", "headline": "Add a location where they might be active", "subheadline": "Enter address, city, or landmark — com autocomplete + mapa embedado", "cta": "→", "mecanismo": "Autocomplete + mapa visual = sensação de 'sistema profissional' (parece Google Maps integrado) → eleva percepção de capacidade técnica e justifica o preço futuro", "observacoes": "Detalhe forte: o mapa renderiza a área selecionada com pinos. Cria a ilusão de que o sistema usa geolocalização real do alvo. Reforça o teatro de scanner sofisticado. Menos perguntas (4 vs 18 do CheaterCatcher) — aposta em ticket alto + decisão rápida."}}, {"numero": 4, "arquivo": "screenshots/04_etapa.png", "titulo": "CheaterScanner AI - Dating App Scanner | Check if Your Partner is Cheating", "url": "https://www.cheaterscanner.com/quiz?qs=pictures", "texto": "What's their gender?\nMale\nFemale\nHow old are they?\nWhat is their name?\nAdd a location where they might be active\n\nEnter the person's last known location\n\n[ Optional ]\nFacial Recognition to Search\nAdd photos\nIdentify Your Partner\nWe Learn About Your Partner\n\nOur AI securely stores your partner's photo, name, and location to create a detailed profile for scanning.\n\nSkip\nNext >", "sig": "bc83838e306ec22ab156c37d5d17b1ae", "analise": {"tipo": "quiz · upload opcional (storytelling técnico)", "headline": "Facial Recognition to Search — Identify Your Partner", "subheadline": "We Learn About Your Partner. Our AI securely stores your partner's photo, name, and location to create a detailed profile for scanning.", "cta": "Skip / Next >", "mecanismo": "Tela de upload posicionada como STORYTELLING do que vai acontecer (não só pedido). Marca '[ Optional ]' reduz fricção mas 'highly recommended' subentendido. 'Securely stores' tira objeção de privacidade.", "observacoes": "Esta tela e a próxima são as ÚNICAS telas de 'persuasão pura' — explicam o mecanismo do produto pra justificar o ticket. Funcionam como mini-VSL textual antes do paywall."}}, {"numero": 5, "arquivo": "screenshots/05_etapa.png", "titulo": "CheaterScanner AI - Dating App Scanner | Check if Your Partner is Cheating", "url": "https://www.cheaterscanner.com/quiz?qs=pictures", "texto": "What's their gender?\nMale\nFemale\nHow old are they?\nWhat is their name?\nAdd a location where they might be active\n\nEnter the person's last known location\n\n[ Optional ]\nFacial Recognition to Search\nAdd photos\nScan the Dating Apps\nWe Scan the Dating Apps\n\nCheaterScanner swipes through Tinder, Bumble, and Hinge profiles in your partner's area, just like a real user would—only faster and smarter. We are not affiliated with Tinder, Bumble, or Hinge. All trademarks are property of their respective owners. We only use publicly available information and never use unauthorized scraping or automated access.\n\nNext >", "sig": "151754fa1bc5f75511ced69769284bb8", "analise": {"tipo": "persuasão · explanação técnica", "headline": "Scan the Dating Apps — We Scan the Dating Apps", "subheadline": "CheaterScanner swipes through Tinder, Bumble, and Hinge profiles in your partner's area, just like a real user would—only faster and smarter.", "cta": "Next >", "mecanismo": "Mecanismo único explicado em uma frase: 'swipes like a real user, faster + smarter'. Disclaimer legal redobrado: 'not affiliated' + 'publicly available information' + 'never use unauthorized scraping'.", "observacoes": "Frase 'swipes through Tinder, Bumble, Hinge in your partner's area' é o MU em si — implica acesso a perfis privados sem dizer isso. 'Like a real user' é a justificativa técnica e a cover legal. CTA mudou de chevron para botão 'Next >' com texto — tradicional pra fechar o quiz com mais autoridade."}}, {"numero": 6, "arquivo": "screenshots/06_etapa.png", "titulo": "CheaterScanner AI - Dating App Scanner | Check if Your Partner is Cheating", "url": "https://www.cheaterscanner.com/quiz?qs=pictures", "texto": "What's their gender?\nMale\nFemale\nHow old are they?\nWhat is their name?\nAdd a location where they might be active\n\nEnter the person's last known location\n\n[ Optional ]\nFacial Recognition to Search\nAdd photos\nEnter your email\nto get the report\n\nImportant! Enter a real email\naddress to receive the report\n\nYour data is 100% private. We never share or sell data.\nEmail\nReceive emails\n\nGet relationship tips, search advice, and updates about new features\n\nGet Cheating Report\nAlready have an account? Log In", "sig": "0ad0545f03e60599baec6951fc100941", "analise": {"tipo": "email gate · pre-paywall", "headline": "Enter your email to get the report", "subheadline": "Important! Enter a real email address to receive the report. Your data is 100% private. We never share or sell data.", "cta": "Get Cheating Report", "mecanismo": "Email gate clássico mas posicionado como entrega (não como bloqueio): 'to receive the report' implica que o report virá. Checkbox de marketing opt-in pré-marcado provavelmente.", "observacoes": "'Important!' em azul = micro-priming pra atenção. 'Real email address' tira fake emails (preserva valor da lista). Linha 'Your data is 100% private' resolve objeção de exposição. CTA vermelho 'Get Cheating Report' = palavra carregada ('cheating') no botão = última fricção emocional. Captura lead antes do paywall = retargeting + abandoned cart."}}, {"numero": 7, "arquivo": "screenshots/07_etapa.png", "titulo": "CheaterScanner AI - Dating App Scanner | Check if Your Partner is Cheating", "url": "https://www.cheaterscanner.com/quiz?qs=pictures", "texto": "What's their gender?\nMale\nFemale\nHow old are they?\nWhat is their name?\nAdd a location where they might be active\n\nEnter the person's last known location\n\n[ Optional ]\nFacial Recognition to Search\nAdd photos\nScanning History\n\nDeep searching billions of public records for Alex\n\n0%\nComplete\nPublic Score\n0\nRetrieving Owner Information for\n\nAlex\n\nPlease be patient while we search billions of records. Your search history is secure and private.\n\nScanning Dating Profile Verification...\nDating Profile Verification\nTinder Profile Scan\nBumble Activity Check\nHinge Account Lookup\nSocial Media Cross-Check\nRelationship History\nHidden Accounts Search\nLocation Cross-Reference\nThousands Have Already\nFound The Truth\n\nExcellent ⭐⭐⭐⭐⭐\n4.75\nbased on\n816 reviews\n\nEmily S.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nFound 3 active dating profiles he swore he deleted. The report even showed when he last logged in. I needed that closure.\n\nUnited States · 2 days ago\n\nJames R.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nMy girlfriend said she was single when we met. Turns out she was still on Tinder and Bumble. CheaterScanner found them both instantly.\n\nUnited Kingdom · 4 days ago\n\nMichelle T.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nHe told me he deleted all his dating apps after we got serious. The scan showed 4 profiles still active. Heartbroken but glad I know.\n\nUnited States · 1 week ago\n\nSarah M.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nI had a gut feeling something was off. The report confirmed he was active on two apps just last week. We're done. Thank you.\n\nCanada · 3 days ago\n\nDavid L.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nShe matched with me on Hinge but her profile was still up. Ran a scan before getting too attached — found she was messaging multiple guys.\n\nAustralia · 5 days ago\n\nRachel V.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nMy husband said he quit dating apps years ago. The scan showed a profile updated just two months ago with new photos. I was devastated.\n\nUnited States · 1 week ago\n\nChris B.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nBefore committing I wanted to be sure. Clean scan — no hidden profiles. Gave me the confidence to actually trust this relationship.\n\nUnited Kingdom · 6 days ago\n\nLisa H.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nI thought I was being catfished. Ran the scan and found the real person's identity plus two other profiles he was using. Unbelievable.\n\nUnited States · 2 weeks ago\n\nAmanda P.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nWe'd been together 2 years. Found an active Tinder profile with photos from our last vacation. The evidence was undeniable.\n\nUnited States · 4 days ago\n\nTom W.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nShe seemed too good to be true. Scan showed she was running 3 profiles under slightly different names. Saved me a lot of pain.\n\nIreland · 3 days ago\n\nNina S.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nHe claimed he only had one old profile he forgot to delete. The scan showed 5 apps, all active within the last 30 days.\n\nUnited States · 5 days ago\n\nDaniel F.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nMy partner denied being on any apps. The report showed profiles on Tinder, Hinge, and a third I'd never heard of. All active recently.\n\nGermany · 1 week ago\n\nOlivia J.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nJust wanted peace of mind before our anniversary. The scan came back clean — best gift I could've given myself.\n\nAustralia · 6 days ago\n\nMarcus B.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nShe said she deleted everything before we made it official. Scan confirmed it — no active profiles. Finally I can stop overthinking.\n\nUnited States · 2 weeks ago\n\nHannah E.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nFound out my boyfriend had an alternate profile using a different first name. The photo match feature is what caught it. Insane detail.\n\nCanada · 3 days ago\n\nJason T.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nThe scan found a profile I never would've found on my own — different photos, fake age, fake city. It was definitely him though.\n\nUnited States · 4 days ago\n\nPriya K.\n⭐⭐⭐⭐⭐\nVerified Customer\n\nThree months in and something felt off. Scan came back with two active profiles and a match history that was very recent. I ended it.\n\nUnited Kingdom · 5 days", "sig": "48cf438f4dab6b23550522d224dda7f7", "analise": {"tipo": "paywall · loading theatrical + social proof massivo", "headline": "Scanning History — Deep searching billions of public records for Alex", "subheadline": "Public Score: 0 (gauge) · Background Check Complete (8 itens: Dating Profile Verification ✓ · Tinder Profile Scan ✓ · Bumble Activity Check ✓ · Hinge Account Lookup ⚠ · Social Media Cross-Check ✓ · Relationship History ✓ · Hidden Accounts Search ⚠ · Location Cross-Reference ⚠)", "cta": "SEE FULL REPORT → (botão único abaixo do fold, acima de wall de depoimentos)", "mecanismo": "Loading theatrical com lista de checagens (8 categorias) + sinalização ⚠ em algumas = curiosity gap dirigido ('o que tem em Hidden Accounts?'). 'Public Score 0' = score gamificado. Depois do gauge: 16+ depoimentos verificados de várias geografias (US, UK, Canada, Australia, Germany, Ireland) — escala de prova social RAÍZA. 4.75★ baseado em 816 reviews.", "observacoes": "Score: estimo 8/12 elementos de paywall presentes. **Falta capturado**: preço, timer, garantia, Stripe embed (provavelmente vem após SEE FULL REPORT). **Tem**: resultado parcial (Public Score), preview censurado implícito (Background Check completo mas sem revelar), bullet list (8 categorias), prova social (4.75★ + 816 reviews + 16 depoimentos longos com nome+país+data). Inferência: paywall final = tripwire $0.99-$4.97 trial + recorrência mensal escondida (padrão do nicho). 16 depoimentos é ANTI-padrão do nicho (a maioria usa 3-5) = aposta em conversão por sobrecarga social. Personagens dos depoimentos cobrem variantes: descoberta de traição (maioria) + confirmação clean (Olivia, Marcus, Chris) — neutraliza ambos os medos."}}]}</script>
+<script>
+let DATA = null;
+let activeFilter = 'all';
+
+async function load() {
+  const inlineEl = document.getElementById('inline-data');
+  if (inlineEl) {
+    DATA = JSON.parse(inlineEl.textContent);
+  } else {
+    const res = await fetch('./etapas.json');
+    DATA = await res.json();
+  }
+
+  const dataCapturaEl = document.getElementById('meta');
+  dataCapturaEl.textContent = `${DATA.total_etapas} etapas · capturado em ${new Date().toLocaleDateString('pt-BR')}`;
+
+  renderFilters();
+  renderNav();
+  renderCards();
+  renderSummary();
+}
+
+function tipoCategoria(tipo) {
+  if (!tipo) return 'outra';
+  const t = tipo.toLowerCase();
+  if (t.includes('landing')) return 'landing';
+  if (t.includes('quiz')) return 'quiz';
+  if (t.includes('loading')) return 'loading';
+  if (t.includes('email')) return 'email';
+  if (t.includes('paywall') || t.includes('checkout')) return 'paywall';
+  if (t.includes('proof') || t.includes('framing') || t.includes('stats') || t.includes('validação') || t.includes('story')) return 'persuasao';
+  return 'outra';
+}
+
+const COR_CATEGORIA = {
+  landing: '#3b82f6',
+  quiz: '#a78bfa',
+  loading: '#eab308',
+  email: '#06b6d4',
+  paywall: '#22c55e',
+  persuasao: '#ec4899',
+  outra: '#6b7280'
+};
+
+function renderFilters() {
+  const container = document.getElementById('filters');
+  const tipos = new Set();
+  DATA.etapas.forEach(e => tipos.add(tipoCategoria(e.analise?.tipo)));
+
+  const labels = {
+    all: 'Todas',
+    landing: '🏠 Landing',
+    quiz: '❓ Quiz',
+    persuasao: '💬 Persuasão',
+    loading: '⏳ Loading',
+    email: '✉️ Email gate',
+    paywall: '💳 Paywall',
+    outra: '· Outra'
+  };
+
+  container.innerHTML = '';
+  Object.keys(labels).forEach(k => {
+    if (k !== 'all' && !tipos.has(k)) return;
+    const b = document.createElement('button');
+    b.className = 'filter-chip' + (k === 'all' ? ' active' : '');
+    b.dataset.filter = k;
+    b.textContent = labels[k];
+    b.onclick = () => setFilter(k);
+    container.appendChild(b);
+  });
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.filter === f);
+  });
+  renderCards();
+}
+
+function renderNav() {
+  const list = document.getElementById('nav-list');
+  list.innerHTML = '';
+  DATA.etapas.forEach(e => {
+    const cat = tipoCategoria(e.analise?.tipo);
+    const a = document.createElement('a');
+    a.className = 'nav-item';
+    a.href = '#etapa-' + e.numero;
+    a.innerHTML = `
+      <span class="nav-num">${String(e.numero).padStart(2, '0')}</span>
+      <div class="nav-title-wrap">
+        <div class="nav-title">${escapeHtml(e.analise?.headline?.slice(0, 30) || 'Etapa ' + e.numero)}</div>
+        <div class="nav-type" style="color:${COR_CATEGORIA[cat]}">${escapeHtml(e.analise?.tipo || '')}</div>
+      </div>
+    `;
+    list.appendChild(a);
+  });
+}
+
+function renderCards() {
+  const cont = document.getElementById('cards');
+  cont.innerHTML = '';
+  DATA.etapas.forEach((e, i) => {
+    const cat = tipoCategoria(e.analise?.tipo);
+    if (activeFilter !== 'all' && cat !== activeFilter) return;
+
+    const card = document.createElement('div');
+    card.className = 'etapa-card';
+    card.id = 'etapa-' + e.numero;
+    card.innerHTML = `
+      <div>
+        <div class="etapa-numero">${String(e.numero).padStart(2, '0')}</div>
+        <div class="etapa-num-label">Etapa</div>
+      </div>
+      <div class="etapa-screenshot">
+        <img src="./${e.arquivo}" alt="Screenshot etapa ${e.numero}" onclick="openModal('./${e.arquivo}')" loading="lazy">
+        <div class="badge-zoom">click p/ zoom</div>
+      </div>
+      <div class="etapa-analise">
+        <span class="etapa-tipo" style="color:${COR_CATEGORIA[cat]};background:${COR_CATEGORIA[cat]}22">${escapeHtml(e.analise?.tipo || '')}</span>
+        <h2>${escapeHtml(e.analise?.headline || '(sem headline)')}</h2>
+        ${e.analise?.subheadline ? `<div class="field">
+          <div class="field-label">Sub / copy de apoio</div>
+          <div class="field-value quote">${escapeHtml(e.analise.subheadline)}</div>
+        </div>` : ''}
+        ${e.analise?.cta ? `<div class="field">
+          <div class="field-label">CTA</div>
+          <div class="field-value"><strong>${escapeHtml(e.analise.cta)}</strong></div>
+        </div>` : ''}
+        ${e.analise?.mecanismo ? `<div class="field">
+          <div class="field-label">Mecanismo de persuasão</div>
+          <div class="field-value mech">${escapeHtml(e.analise.mecanismo)}</div>
+        </div>` : ''}
+        ${e.analise?.observacoes ? `<div class="field">
+          <div class="field-label">Observações</div>
+          <div class="field-value obs">${escapeHtml(e.analise.observacoes)}</div>
+        </div>` : ''}
+        <p class="etapa-url">${escapeHtml(e.url || '')}</p>
+        <div class="actions">
+          <button class="copy-btn" onclick="copyCopy(this, ${e.numero})">📋 Copiar copy bruta</button>
+          <button class="copy-btn" onclick="copyAnalysis(this, ${e.numero})">📊 Copiar análise</button>
+        </div>
+      </div>
+    `;
+    cont.appendChild(card);
+
+    // conector
+    if (i < DATA.etapas.length - 1) {
+      const conn = document.createElement('div');
+      conn.className = 'conector';
+      conn.textContent = '↓';
+      cont.appendChild(conn);
+    }
+  });
+}
+
+function renderSummary() {
+  const grid = document.getElementById('summary-grid');
+  const tipos = {};
+  const ctas = [];
+  DATA.etapas.forEach(e => {
+    const t = e.analise?.tipo || '?';
+    tipos[t] = (tipos[t] || 0) + 1;
+    if (e.analise?.cta && !ctas.includes(e.analise.cta)) ctas.push(e.analise.cta);
+  });
+
+  const html = [
+    `<div class="stat"><div class="stat-num">${DATA.total_etapas}</div><div class="stat-label">etapas mapeadas</div></div>`,
+    `<div class="stat"><div class="stat-num">${Object.keys(tipos).length}</div><div class="stat-label">tipos distintos</div></div>`,
+    `<div class="stat"><div class="stat-num">${ctas.length}</div><div class="stat-label">CTAs únicos</div></div>`,
+    `<div class="stat" style="grid-column:span 2"><div class="stat-label" style="margin-bottom:8px">Distribuição por tipo</div>${Object.entries(tipos).map(([t, n]) => `<div style="font-size:0.82rem;color:#ccc;margin:2px 0">• ${escapeHtml(t)} <span style="color:#f97316;font-weight:600">×${n}</span></div>`).join('')}</div>`,
+    `<div class="stat" style="grid-column:span 2"><div class="stat-label" style="margin-bottom:8px">CTAs identificados</div>${ctas.map(c => `<div style="font-size:0.82rem;color:#ccc;margin:2px 0">→ ${escapeHtml(c)}</div>`).join('')}</div>`,
+  ].join('');
+  grid.innerHTML = html;
+}
+
+function openModal(src) {
+  const m = document.getElementById('modal');
+  document.getElementById('modal-img').src = src;
+  m.classList.add('active');
+}
+
+function closeModal(ev) {
+  if (ev && ev.target && ev.target.tagName === 'IMG' && ev.target.id === 'modal-img') return;
+  document.getElementById('modal').classList.remove('active');
+}
+
+function copyCopy(btn, num) {
+  const e = DATA.etapas.find(x => x.numero === num);
+  navigator.clipboard.writeText(e.texto || '').then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '📋 Copiar copy bruta'; }, 1500);
+  });
+}
+
+function copyAnalysis(btn, num) {
+  const e = DATA.etapas.find(x => x.numero === num);
+  const a = e.analise || {};
+  const txt = `ETAPA ${num}
+- Tipo: ${a.tipo}
+- Headline: "${a.headline}"
+- Sub: "${a.subheadline}"
+- CTA: "${a.cta}"
+- Mecanismo: ${a.mecanismo}
+- Observações: ${a.observacoes}`;
+  navigator.clipboard.writeText(txt).then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '📊 Copiar análise'; }, 1500);
+  });
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[c]);
+}
+
+// Active nav highlight on scroll
+function setupScrollSpy() {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        const id = en.target.id.replace('etapa-', '');
+        document.querySelectorAll('.nav-item').forEach(n => {
+          n.classList.toggle('active', n.getAttribute('href') === '#etapa-' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  document.querySelectorAll('.etapa-card').forEach(c => observer.observe(c));
+}
+
+// Escape closes modal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('modal').classList.remove('active');
+});
+
+load().then(() => setTimeout(setupScrollSpy, 100));
+</script>
+
+</body>
+</html>
