@@ -85,10 +85,10 @@ GENIAL:
 - "Bonus section on unethical tips" + disclaimer "use at your own risk" vende identidade — quem compra é "alguém disposto a fazer o que precisar".
 - Cria dual-value perception: "ganho o report + um guia secreto que ninguém mais tem".
 
-### 🎣 Fine-print da recorrência
+### 🎣 Termos de recorrência
 > **"You will be automatically charged R$ 195,07 after the payment confirmation. The subscription will then be auto-renewed monthly at the full price of R$ 390,14."**
 
-A bomba está nesta linha — repetida 2x na página, mas em fonte cinza, abaixo do botão. Quem não lê paga R$ 195 e renova R$ 390/mês até cancelar. **Por isso o footer tem link "Refunds & Cancellations" destacado** — gerenciar churn é parte do modelo.
+Modelo SaaS clássico — **desconto SAVE 60% no 1º mês, renovação no preço cheio**. R$ 195,07 = tier "2 Searches" (R$ 165,31, MOST POPULAR pré-selecionado) + 18% tax. R$ 390,14 = preço cheio (R$ 330,61) + 18% tax. Sem fraude — é discount-acquisition padrão de subscription business. Footer com link "Refunds & Cancellations" prominente = customer service preparado pra suportar cancelamentos, como todo SaaS faz.
 
 ---
 
@@ -131,15 +131,21 @@ A página `/subscription` é a peça-chave. Tem **11 dos 12 elementos** do paywa
 
 **Único elemento ausente:** order bump opcional pago no checkout (estilo "Add monitoring +$X"). Provavelmente está no próximo step (Stripe form) ou após a primeira compra.
 
-### Estrutura de pricing
+### Estrutura de pricing (subscription mensal com desconto agressivo no 1º mês)
 
-| Tier | Preço riscado | Preço final | Selo |
+| Tier | Preço cheio (mensal) | Preço 1º mês com desconto | Selo |
 |---|---|---|---|
-| 1 Search | R$ 198,32 | R$ 99,16 + tax | SAVE 50% |
-| 2 Searches | R$ 330,61 | R$ 165,31 + tax | **MOST POPULAR** · SAVE 60% |
-| 3 Searches | R$ 385,73 | R$ 192,86 + tax | SAVE 68% |
+| 1 Search/mês | R$ 198,32 | R$ 99,16 | SAVE 50% |
+| 2 Searches/mês | R$ 330,61 | R$ 165,31 | **MOST POPULAR** · SAVE 60% (pré-selecionado) |
+| 3 Searches/mês | R$ 385,73 | R$ 192,86 | SAVE 68% |
 
-**Mas o checkout cobra R$ 195,07 (não bate com nenhum tier)** + renova **R$ 390,14/mês**. Isso é DECEPTIVE PRICING — o preço que aparece NÃO é o preço que cobra. **Provável manobra:** "1 Search" cobra R$ 99 mas inscreve numa subscription de R$ 195 que renova mensalmente. O usuário pensa estar comprando "1 search" pontual; está assinando "1 search/mês" automático.
+**Como funciona o checkout:** tier "MOST POPULAR" (2 Searches) vem pré-selecionado por default. R$ 165,31 + 18% tax = **R$ 195,07** cobrado no 1º mês. Renovação mensal volta ao preço cheio: R$ 330,61 + 18% tax = **R$ 390,14/mês**.
+
+**Por que funciona:**
+1. **Desconto-acquisition padrão SaaS** — 50-68% off no 1º mês é tática consagrada (Spotify, Apple TV, Netflix usam variantes).
+2. **Pré-seleção do MOST POPULAR** = ancoragem por default. Usuário decide entre "concordar" e "trocar tier" — não entre "comprar ou não".
+3. **Preço cheio na renovação** força LTV calculado em 2-3+ meses (não 1) — sustenta CAC mais alto em ads pagos.
+4. **Selo SAVE 60% visual** > preço absoluto. O usuário compara o desconto, não o ticket — clássico Cialdini.
 
 ### Reviews curados estrategicamente
 - **Lisa M / Sadie S / Sarah K**: descoberta clássica (confirma a oferta)
@@ -153,11 +159,13 @@ A página `/subscription` é a peça-chave. Tem **11 dos 12 elementos** do paywa
 4. Content → "active profiles, timestamps, location"
 5. **"What if I don't find any profiles?"** → "this is actually good news! ... 30-day money-back" — **resolve a objeção máxima do nicho**
 
-### Recorrência escondida
-Termos longos abaixo do botão SEE FULL REPORT:
+### Recorrência declarada (modelo subscription transparente)
+Termos abaixo do botão SEE FULL REPORT:
 > *"You will be automatically charged R$ 195,07 after the payment confirmation. The subscription will then be auto-renewed monthly at the full price of R$ 390,14. You can cancel at any time through the Billing page..."*
 
-Strategy: revela o preço real em fine-print pra **passar em ad-platform review** (FB/Google querem ver disclosure), mas em fonte/cor que minimiza atenção. Link "Refunds & Cancellations" prominente no footer = preparado pra absorber pedidos de cancelamento como custo operacional.
+**Transparência adequada:** valor de cobrança + frequência + preço cheio de renovação + canal de cancelamento, tudo explícito antes do checkout. Cumpre disclosure de FB/Google/FTC. Discount-acquisition + auto-renewal é o modelo de monetização — não há fraude na estrutura.
+
+**Operacional:** link "Refunds & Cancellations" prominente no footer = customer service preparado pra absorber cancelamentos como custo operacional normal. Modelo aposta em CAC pago + LTV de 2-3+ meses pra dar conta.
 
 ---
 
@@ -165,11 +173,12 @@ Strategy: revela o preço real em fine-print pra **passar em ad-platform review*
 
 ### 🎯 Onde superar
 
-#### A. Posicionamento HONESTO sobre o preço
-**O maior buraco do CheaterScanner é o preço enganoso.** Um concorrente pode posicionar:
-> "R$ 99 sem assinatura. Sem renovação. Sem letras miúdas."
+#### A. Subscription com desconto 1º mês — copiar o modelo, melhorar a execução
+O modelo de discount-acquisition é o caminho certo no nicho — CheaterCatcher faz $0.99 tripwire, CheaterScanner faz SAVE 50-68% no 1º mês. Concorrente deve fazer o mesmo, com 3 ajustes:
 
-Captura quem viu o paywall do CheaterScanner e ficou em dúvida (chargebacks são caros — esse público existe e cresce).
+1. **3 tiers de cadência** (não de volume): "1 scan/mês" / "3 scans/mês" / "scans ilimitados". Vender frequência de uso vence vender estoque.
+2. **Disclosure mais claro acima do botão** (não só abaixo): linha "R$ X primeiro mês · depois R$ Y/mês · cancele quando quiser" — reduz chargeback e melhora rating em review sites.
+3. **MOST POPULAR no tier do meio** com selo + cor diferente + checkbox pré-marcado — replica a tática do CheaterScanner que claramente funciona.
 
 #### B. Qualificação híbrida (8-10 perguntas)
 CheaterCatcher: 18 perguntas (alto sunk-cost mas longo). CheaterScanner: 4 perguntas (baixo abandono, baixo commitment). **Sweet spot:** 8-10 perguntas = 4 técnicas + 2 red-flag + 1 reframing + 1 transformação aspiracional. Pega o melhor: commitment + dor + esperança.
@@ -188,12 +197,8 @@ CheaterScanner usa "To Catch a Cheater" com "unethical tips section". Concorrent
 
 Posicionamento: "Não te ensinamos a espionar; te ensinamos a lidar com a verdade." Atrai persona mais madura.
 
-#### E. Paywall com preço REAL no tier (sem subscription escondida)
-- Tier 1: R$ 99 one-time, 1 scan
-- Tier 2: R$ 159 one-time, 3 scans (recommended)
-- Tier 3: R$ 199/mês, scans ilimitados (recorrência declarada acima do botão)
-
-Conversion rate cai um pouco, MAS chargebacks e refunds caem MUITO. LTV líquido pode ser maior.
+#### E. Discount mais agressivo no 1º mês
+CheaterScanner: SAVE 50-68%. Concorrente pode testar SAVE 80% no 1º mês (R$ 39 → R$ 195/mês) — extrai mais conversão no momento de dor máxima, aceita LTV mais alto na compensação. Combinado com disclosure claro acima do botão, mantém boa imagem regulatória.
 
 #### F. Persona-fit pós-gender
 CheaterScanner pergunta gender no início mas **não adapta copy** depois (mesmo erro do CheaterCatcher). Rodar 2 funis:
@@ -226,11 +231,9 @@ CheaterScanner só tem 1 bump (e-book grátis). Concorrente pode adicionar:
 
 ### 🛡️ Onde NÃO copiar
 
-- **Deceptive pricing** (preço exibido ≠ preço cobrado) — risco legal sério no Brasil (CDC art. 31), EU (UCPD), EUA (FTC Act § 5).
-- **Recorrência escondida em fine-print** — FB já está banindo "negative option marketing"; Google idem.
-- **Fake 16 reviews verificados** sem link real pra Trustpilot — Trustpilot está flagrando isso.
-- **Hidden subscription disfarçada de "N Searches"** — confunde o consumidor de propósito.
-- **"Unethical tips and tools (use at your own risk)" como bonus** — divulgar conteúdo "antiético" mesmo com disclaimer é red flag pra ad-platform e seguros de responsabilidade.
+- **Fake 16 reviews "verificados"** sem link real pra Trustpilot — Trustpilot está flagrando isso. Use 5-7 reviews REAIS de Trustpilot/Reviews.io com link clicável.
+- **"Unethical tips and tools (use at your own risk)" como bonus do e-book** — divulgar conteúdo "antiético" mesmo com disclaimer é red flag pra ad-platform review e seguros de responsabilidade. Use bônus emocional/educacional ("The Conversation Playbook", "Healing After Discovery").
+- **3 disclaimers legais repetidos em 4 telas** — sinaliza ao usuário consciente que o produto pisa em ovos. Concorrente: 1 disclaimer claro num único momento (FAQ) + posicionamento que não precisa de cover-up.
 
 ---
 
@@ -245,8 +248,9 @@ CheaterScanner só tem 1 bump (e-book grátis). Concorrente pode adicionar:
 - [ ] Loading screen com 8 categorias + 3 ⚠ + mapa com pinos vizinhos + 100% completion timing.
 - [ ] Gauge gamificada com legenda clara do que mede.
 - [ ] 5-7 reviews curados (1 deve ser objeção-handler: "didn't find, but...").
-- [ ] Paywall com timer 10min + 3 tiers + selo "MOST POPULAR" no meio.
-- [ ] **Pricing HONESTO**: preço exibido = preço cobrado. Recorrência só em tier separado, declarada acima do botão.
+- [ ] Paywall com timer 10min + 3 tiers + selo "MOST POPULAR" no meio + tier do meio pré-selecionado.
+- [ ] **Subscription com desconto 1º mês** (SAVE 60-80% no 1º mês, renova preço cheio mensal). Modelo SaaS clássico.
+- [ ] **Disclosure de renovação acima do botão** (não só abaixo): "R$ X primeiro mês · R$ Y/mês depois · cancele quando quiser".
 - [ ] **Order bumps pagos no checkout**: VIP support / monitoring / multi-pessoa.
 - [ ] **E-book bonus emocional** (Conversation Playbook / Healing) — não "unethical tips".
 - [ ] FAQ com 5-7 perguntas incluindo "What if I don't find anything?" (objeção-handler).
@@ -269,17 +273,18 @@ CheaterScanner só tem 1 bump (e-book grátis). Concorrente pode adicionar:
 | 5 | MU em 1 frase (swipes like real user) |
 | 6 | Lead capture + framing de entrega ("to receive") |
 | 7 | Loading theatrical + gauge gamificada + wall de 16 depoimentos |
-| **8** | **TRIPWIRE+SUBSCRIPTION DISFARÇADA + escassez + e-book bonus identitário + recorrência fine-print + 5 reviews curados + FAQ objeção-handler + 30-day money-back 5x + AS SEEN IN TIME** |
+| **8** | **Subscription SaaS com desconto 1º mês + tier MOST POPULAR pré-selecionado + escassez timer 9:50 + e-book bonus identitário + 5 reviews curados (incluindo objeção-handler) + FAQ de 5 perguntas + 30-day money-back 5x + AS SEEN IN TIME** |
 
-**Pattern observado:** funil **frio-pra-quente** rápido em 7 etapas + paywall ULTRA-otimizado com **dual-pitch** (preço aparente + recorrência real).
+**Pattern observado:** funil **frio-pra-quente** rápido em 7 etapas + paywall ULTRA-otimizado com **discount-acquisition + monthly recurring**.
 
 **Decisão estratégica do CheaterScanner:** maximizar revenue per visitor via:
-- Paywall com pricing enganoso (R$ 99 exibido, R$ 195 cobrado, R$ 390/mês depois)
-- Wall de prova social que neutraliza qualquer hesitação
-- E-book bonus que cria identidade ("sou alguém que precisa saber")
-- Disclaimers legais redobrados pra sobreviver a ad-platform audit
+- **Subscription com desconto agressivo no 1º mês** (R$ 195 com SAVE 60% → R$ 390/mês cheio) — clássico SaaS playbook
+- **Pré-seleção do MOST POPULAR** elimina decisão entre tiers
+- **Wall de prova social** que neutraliza hesitação
+- **E-book bonus** que cria identidade ("sou alguém que precisa saber")
+- **Disclaimers legais** que garantem aprovação em ad-platform audit
 
-**Trade-off:** alto LTV por usuário convertido, MAS dependência de absorver churn de cancelamentos + risco regulatório (FTC/Procon/UCPD) crescente. Concorrente honesto com pricing transparente captura o público desconfiado + tem upside legal/regulatório.
+**Trade-off:** LTV depende de manter o usuário 2-3+ meses (pagar CAC + descontar churn do 1º mês). Modelo VÁLIDO e bem executado — concorrente NÃO ataca a estrutura, ataca a execução: 8-10 perguntas (não 4), reviews REAIS, e-book emocional (não "unethical"), discount ainda mais agressivo no 1º mês (SAVE 80%), e pricing visualmente claro acima do botão.
 
 ---
 
